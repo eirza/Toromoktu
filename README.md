@@ -32,7 +32,7 @@ axel, bmon, htop, iftop, mtr, rkhunter, nethogs: nethogs venet0
 ### Other Features
 
 * Webmin : http://IPVPS:10000/
-* vnstat : http://IPVPS:81/vnstat/ (Cek Bandwith)
+* vnstat : http://IPVPS:81/vnstat/ (Bandwith Check)
 * MRTG : http://IPVPS:81/mrtg/
 * Timezone : Asia/Singapore (GMT +8)
 * Fail2Ban : [on]
