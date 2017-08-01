@@ -1,5 +1,3 @@
-Toromoktu_Debian7
-
 Auto Install Script For VPS Debian7 - www.twitter.com/eirza
 
 wget https://github.com/ForNesiaFreak/FNS_Debian7/raw/fornesia.com/debian7.sh
