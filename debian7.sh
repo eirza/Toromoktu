@@ -1,14 +1,12 @@
 #!/bin/bash
 #
-# Script Copyright Toromoktu
+# Script Copyright www.fornesia.com
 # ==========================
 # 
 
 # initialisasi var
 export DEBIAN_FRONTEND=noninteractive
 OS=`uname -m`;
-MYIP=$(wget -qO- ipv4.icanhazip.com);
-MYIP2="s/xxxxxxxxx/$MYIP/g";
 
 # go to root
 cd
@@ -20,15 +18,15 @@ sed -i '$ i\echo 1 > /proc/sys/net/ipv6/conf/all/disable_ipv6' /etc/rc.local
 # install wget and curl
 apt-get update;apt-get -y install wget curl;
 
-# set time GMT +8
-ln -fs /usr/share/zoneinfo/Asia/Singapore /etc/localtime
+# set time GMT +7
+ln -fs /usr/share/zoneinfo/Asia/Jakarta /etc/localtime
 
 # set locale
 sed -i 's/AcceptEnv/#AcceptEnv/g' /etc/ssh/sshd_config
 service ssh restart
 
 # set repo
-wget -O /etc/apt/sources.list "https://raw.githubusercontent.com/eirza/Toromoktu/master/sources.list.debian7"
+wget -O /etc/apt/sources.list "https://raw.githubusercontent.com/ForNesiaFreak/FNS_Debian7/fornesia.com/null/sources.list.debian7"
 wget "http://www.dotdeb.org/dotdeb.gpg"
 wget "http://www.webmin.com/jcameron-key.asc"
 cat dotdeb.gpg | apt-key add -;rm dotdeb.gpg
@@ -42,6 +40,9 @@ apt-get -y --purge remove bind9*;
 
 # update
 apt-get update; apt-get -y upgrade;
+
+# install webserver
+apt-get -y install nginx php5-fpm php5-cli
 
 # install essential package
 echo "mrtg mrtg/conf_mods boolean true" | debconf-set-selections
@@ -62,11 +63,24 @@ service vnstat restart
 
 # install screenfetch
 cd
-wget 'https://raw.githubusercontent.com/eirza/Toromoktu/master/screenfetch-dev'
+wget 'https://raw.githubusercontent.com/ForNesiaFreak/FNS_Debian7/fornesia.com/null/screenfetch-dev'
 mv screenfetch-dev /usr/bin/screenfetch-dev
 chmod +x /usr/bin/screenfetch-dev
 echo "clear" >> .profile
 echo "screenfetch-dev" >> .profile
+
+# install webserver
+cd
+rm /etc/nginx/sites-enabled/default
+rm /etc/nginx/sites-available/default
+wget -O /etc/nginx/nginx.conf "https://raw.githubusercontent.com/ForNesiaFreak/FNS_Debian7/fornesia.com/null/nginx.conf"
+mkdir -p /home/vps/public_html
+echo "<pre>www.twitter.com/eirza</pre>" > /home/vps/public_html/index.html
+echo "<?php phpinfo(); ?>" > /home/vps/public_html/info.php
+wget -O /etc/nginx/conf.d/vps.conf "https://raw.githubusercontent.com/ForNesiaFreak/FNS_Debian7/fornesia.com/null/vps.conf"
+sed -i 's/listen = \/var\/run\/php5-fpm.sock/listen = 127.0.0.1:9000/g' /etc/php5/fpm/pool.d/www.conf
+service php5-fpm restart
+service nginx restart
 
 cd
 
@@ -82,7 +96,7 @@ screen -AmdS badvpn badvpn-udpgw --listen-addr 127.0.0.1:7300
 
 # install mrtg
 wget -O /etc/snmp/snmpd.conf "https://raw.githubusercontent.com/eirza/Toromoktu/master/snmpd.conf"
-wget -O /root/mrtg-mem.sh "https://raw.githubusercontent.com/eirza/Toromoktu/master/mrtg-mem.sh"
+wget -O /root/mrtg-mem.sh "https://raw.githubusercontent.com/ForNesiaFreak/FNS_Debian7/fornesia.com/null/mrtg-mem.sh"
 chmod +x /root/mrtg-mem.sh
 cd /etc/snmp/
 sed -i 's/TRAPDRUN=no/TRAPDRUN=yes/g' /etc/default/snmpd
@@ -90,7 +104,7 @@ service snmpd restart
 snmpwalk -v 1 -c public localhost 1.3.6.1.4.1.2021.10.1.3.1
 mkdir -p /home/vps/public_html/mrtg
 cfgmaker --zero-speed 100000000 --global 'WorkDir: /home/vps/public_html/mrtg' --output /etc/mrtg.cfg public@localhost
-curl "https://raw.githubusercontent.com/eirza/Toromoktu/master/mrtg.conf" >> /etc/mrtg.cfg
+curl "https://raw.githubusercontent.com/ForNesiaFreak/FNS_Debian7/fornesia.com/null/mrtg.conf" >> /etc/mrtg.cfg
 sed -i 's/WorkDir: \/var\/www\/mrtg/# WorkDir: \/var\/www\/mrtg/g' /etc/mrtg.cfg
 sed -i 's/# Options\[_\]: growright, bits/Options\[_\]: growright/g' /etc/mrtg.cfg
 indexmaker --output=/home/vps/public_html/mrtg/index.html /etc/mrtg.cfg
@@ -101,6 +115,7 @@ cd
 
 # setting port ssh
 sed -i 's/Port 22/Port 22/g' /etc/ssh/sshd_config
+#sed -i '/Port 22/a Port 80' /etc/ssh/sshd_config
 sed -i '/Port 22/a Port 143' /etc/ssh/sshd_config
 sed -i 's/#Banner/Banner/g' /etc/ssh/sshd_config
 service ssh restart
@@ -143,6 +158,12 @@ cd
 # install fail2ban
 apt-get -y install fail2ban;service fail2ban restart
 
+# install squid3
+apt-get -y install squid3
+wget -O /etc/squid3/squid.conf "https://raw.githubusercontent.com/ForNesiaFreak/FNS_Debian7/fornesia.com/null/squid3.conf"
+sed -i $MYIP2 /etc/squid3/squid.conf;
+service squid3 restart
+
 # install webmin
 cd
 wget -O webmin-current.deb "http://www.webmin.com/download/deb/webmin-current.deb"
@@ -158,9 +179,9 @@ wget -O speedtest_cli.py "https://raw.githubusercontent.com/ForNesiaFreak/FNS_De
 wget -O bench-network.sh "https://raw.githubusercontent.com/ForNesiaFreak/FNS_Debian7/fornesia.com/null/bench-network.sh"
 wget -O ps_mem.py "https://raw.githubusercontent.com/ForNesiaFreak/FNS_Debian7/fornesia.com/null/ps_mem.py"
 wget -O dropmon "https://raw.githubusercontent.com/ForNesiaFreak/FNS_Debian7/fornesia.com/null/dropmon.sh"
-wget -O user-login.sh "https://raw.githubusercontent.com/eirza/Toromoktu/master/user-login.sh"
+wget -O user-login.sh "https://raw.githubusercontent.com/ForNesiaFreak/FNS_Debian7/fornesia.com/freak/user-login.sh"
 wget -O user-expired.sh "https://raw.githubusercontent.com/ForNesiaFreak/FNS_Debian7/fornesia.com/freak/user-expired.sh"
-wget -O user-list.sh "https://raw.githubusercontent.com/eirza/Toromoktu/master/user-list.sh"
+wget -O user-list.sh "https://raw.githubusercontent.com/ForNesiaFreak/FNS_Debian7/fornesia.com/freak/user-list.sh"
 wget -O /etc/issue.net "https://raw.githubusercontent.com/eirza/Toromoktu/master/banner"
 echo "0 0 * * * root /root/user-expired.sh" > /etc/cron.d/user-expired
 echo "0 0 * * * root /usr/bin/reboot" > /etc/cron.d/reboot
@@ -170,18 +191,21 @@ chmod +x speedtest_cli.py
 chmod +x ps_mem.py
 chmod +x user-login.sh
 chmod +x user-expired.sh
+#chmod +x userlimit.sh
 chmod +x dropmon
 chmod +x user-list.sh
 
 # finishing
 chown -R www-data:www-data /home/vps/public_html
 service cron restart
+service nginx start
 service php-fpm start
 service vnstat restart
 service snmpd restart
 service ssh restart
 service dropbear restart
 service fail2ban restart
+service squid3 restart
 service webmin restart
 rm -rf ~/.bash_history && history -c
 echo "unset HISTFILE" >> /etc/profile
@@ -196,7 +220,10 @@ echo "-------"  | tee -a log-install.txt
 echo "OpenSSH  : 22, 143"  | tee -a log-install.txt
 echo "Dropbear : 443, 110, 109"  | tee -a log-install.txt
 echo "Squid3    : 80, 8080, 3128 (limit to IP SSH)"  | tee -a log-install.txt
+#echo "OpenVPN  : TCP 1194 (client config : http://$MYIP:81/client.ovpn)"  | tee -a log-install.txt
 echo "badvpn   : badvpn-udpgw port 7300"  | tee -a log-install.txt
+#echo "PPTP VPN  : Create User via Putty (echo "username pptpd password *" >> /etc/ppp/chap-secrets)"  | tee -a log-install.txt
+echo "nginx    : 81"  | tee -a log-install.txt
 echo ""  | tee -a log-install.txt
 echo "Tools"  | tee -a log-install.txt
 echo "-----"  | tee -a log-install.txt
@@ -218,15 +245,15 @@ echo "----------"  | tee -a log-install.txt
 echo "Webmin   : http://$MYIP:10000/"  | tee -a log-install.txt
 echo "vnstat   : http://$MYIP:81/vnstat/ (Cek Bandwith)"  | tee -a log-install.txt
 echo "MRTG     : http://$MYIP:81/mrtg/"  | tee -a log-install.txt
-echo "Timezone : Asia/Singapore (GMT +8)"  | tee -a log-install.txt
+echo "Timezone : Asia/Jakarta (GMT +7)"  | tee -a log-install.txt
 echo "Fail2Ban : [on]"  | tee -a log-install.txt
 echo "IPv6     : [off]"  | tee -a log-install.txt
 echo ""  | tee -a log-install.txt
-echo "Auto Script Installer Toromoktu"  | tee -a log-install.txt
+echo "Auto Script Installer Vps Alviena Pramesty - www.fornesia.com"  | tee -a log-install.txt
 echo ""  | tee -a log-install.txt
-echo "Installation Log --> /root/log-install.txt"  | tee -a log-install.txt
+echo "Log Instalasi --> /root/log-install.txt"  | tee -a log-install.txt
 echo ""  | tee -a log-install.txt
-echo "VPS AUTO REBOOT EVERY 12 HRS, PLS REBOOT YOUR VPS !"  | tee -a log-install.txt
+echo "VPS AUTO REBOOT TIAP 12 JAM, SILAHKAN REBOOT VPS ANDA !"  | tee -a log-install.txt
 echo ""  | tee -a log-install.txt
 echo "==========================================="  | tee -a log-install.txt
 cd
