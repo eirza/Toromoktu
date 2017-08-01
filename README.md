@@ -1,24 +1,24 @@
-Toromoktu_Debian7
+# Toromoktu_Debian7
 
-Auto Install Script For VPS Debian7 - www.twitter.com/eirza
+### Auto Install Script For VPS Debian7 - www.twitter.com/eirza
 
 	wget https://github.com/eirza/Toromoktu/raw/master/debian7.sh
 	bash debian7.sh
 
-Autoscript Include:
+## Autoscript Include:
 
-Service
+### Services
 
-OpenSSH : 22, 143
-Dropbear : 443, 110, 109
-Squid3 : 80, 8080 (limit to IP SSH)
-badvpn : badvpn-udpgw port 7300
+* OpenSSH : 22, 143
+* Dropbear : 443, 110, 109
+* Squid3 : 80, 8080 (limit to IP SSH)
+* badvpn : badvpn-udpgw port 7300
 
-Tools
+### Tools
 
 axel, bmon, htop, iftop, mtr, rkhunter, nethogs: nethogs venet0
 
-Script
+### Script
 
 	screenfetch
 	./ps_mem.py (Cek RAM)
@@ -29,18 +29,13 @@ Script
 	./user-list.sh (View Registered Users)
 	sh dropmon [port]
 
-Other Features
+### Other Features
 
-Webmin : http://IPVPS:10000/
+* Webmin : http://IPVPS:10000/
+* vnstat : http://IPVPS:81/vnstat/ (Cek Bandwith)
+* MRTG : http://IPVPS:81/mrtg/
+* Timezone : Asia/Singapore (GMT +8)
+* Fail2Ban : [on]
+* IPv6 : [off]
 
-vnstat : http://IPVPS:81/vnstat/ (Cek Bandwith)
-
-MRTG : http://IPVPS:81/mrtg/
-
-Timezone : Asia/Singapore (GMT +8)
-
-Fail2Ban : [on]
-
-IPv6 : [off]
-
-DAILY VPS AUTO REBOOT
+**_DAILY VPS AUTO REBOOT_**
