@@ -21,7 +21,7 @@ axel, bmon, htop, iftop, mtr, rkhunter, nethogs: nethogs venet0
 ### Script
 
 	screenfetch
-	./ps_mem.py (Cek RAM)
+	./ps_mem.py (RAM Check)
 	./speedtest_cli.py --share (VPS Speed Test)
 	./bench-network.sh (VPS Performance Benchmark)
 	./user-login.sh (User Login Monitor)
